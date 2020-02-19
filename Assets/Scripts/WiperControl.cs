@@ -4,17 +4,26 @@ using UnityEngine;
 
 public class WiperControl : MonoBehaviour
 {
-    public float wiperSpeed;
     private Rigidbody2D rb;
+
+    public float wiperSpeed;
+    public float maxDistanceFromBody;
+
     private PlayerController playerScript;
+    private Transform playerTransform;
     private float playerSpeed;
+
 
     // Start is called before the first frame update
     void Start()
     {
-        wiperSpeed = 0.1f;
         rb = GetComponent<Rigidbody2D>();
+
+        wiperSpeed = 0.1f;
+        maxDistanceFromBody = 4.3f;
+
         playerScript = GameObject.Find("Body").GetComponent<PlayerController>();
+        playerTransform = GameObject.Find("Body").transform;
     }
 
     // Update is called once per frame
@@ -31,6 +40,10 @@ public class WiperControl : MonoBehaviour
       else if(Input.GetKey(KeyCode.LeftArrow)) moveX -= wiperSpeed;
       if(Input.GetKey(KeyCode.UpArrow)) moveY += wiperSpeed;
       else if(Input.GetKey(KeyCode.DownArrow)) moveY -= wiperSpeed;
-      transform.position = new Vector2(transform.position.x + moveX, transform.position.y + moveY);
+
+      Vector2 newPos = new Vector2(transform.position.x + moveX, transform.position.y + moveY);
+      // check if newPos is legal (close enough to the body)
+      float distance = Mathf.Abs(Vector2.Distance(newPos, playerTransform.position));
+      if(distance < maxDistanceFromBody) transform.position = newPos;
     }
 }
